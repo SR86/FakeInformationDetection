@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}登录 - Fake Information Detection{% endblock %}
+
+{% block content %}
+<video autoplay muted loop id="bg-video">
+  <source src="{{ url_for('static', filename='video/login_bg.mp4') }}" type="video/mp4">
+</video>
+<style>
+  /* 背景视频样式 */
+  #bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    z-index: -2;
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: -1;
+  }
+
+  body {
+    background: transparent;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .login-container {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .card {
+    width: 360px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .card-body {
+    padding: 2.5rem 2rem;
+  }
+
+  h3.card-title {
+    margin-bottom: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  label.form-label {
+    font-weight: 600;
+    color: #eeeeee; /* 浅灰色标签文字 */
+  }
+
+  input.form-control {
+    border-radius: 8px;
+    border: 1.8px solid #ced4da;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #000000;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  input.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
+    outline: none;
+  }
+
+  button.btn-primary {
+    width: 100%;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 12px 0;
+    background: linear-gradient(45deg, #0069d9, #0053ba);
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 105, 217, 0.4);
+    transition: background 0.3s ease;
+    color: #ffffff;
+    margin-top: 5px;
+  }
+
+  button.btn-primary:hover {
+    background: linear-gradient(45deg, #0053ba, #004299);
+  }
+
+  .text-center {
+    margin-top: 1.25rem;
+    font-size: 0.9rem;
+    color: #eeeeee;  /* 更浅的灰色 */
+  }
+
+  .text-center a {
+    color: #aad4ff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+
+  .text-center a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+  }
+
+  .alert-danger {
+    margin-top: 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    background-color: rgba(255, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: #fff;
+  }
+</style>
+
+
+<div class="login-container">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h3 class="card-title">用户登录</h3>
+      <form method="POST" novalidate>
+        <div class="mb-3">
+          <label for="username" class="form-label">用户名</label>
+          <input type="text" id="username" name="username" class="form-control" placeholder="请输入用户名" required autofocus>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">密码</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="请输入密码" required>
+        </div>
+        <button type="submit" class="btn btn-primary">登录</button>
+      </form>
+
+      <div class="text-center">
+        <p>还没有账号？<a href="{{ url_for('register') }}">立即注册</a></p>
+        <p><a href="{{ url_for('forgot_password') }}">忘记密码？</a></p>
+      </div>
+
+      {% if error %}
+        <div class="alert alert-danger" role="alert">{{ error }}</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const inputs = Array.from(document.querySelectorAll('input.form-control'));
+
+    inputs.forEach((input, index) => {
+      input.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();  // 阻止默认提交
+          const nextInput = inputs[index + 1];
+          if (nextInput) {
+            nextInput.focus();
+          } else {
+            // 如果没有下一个输入框，则查找并点击提交按钮
+            const submitBtn = document.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.click();
+          }
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}

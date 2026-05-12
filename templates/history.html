@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}历史记录 - Fake Information Detection{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4 text-primary text-center">历史记录</h1>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <form method="get" action="{{ url_for('history') }}" class="w-50">
+            <div class="form-group">
+                <label for="modelFilter" class="form-label">选择模型</label>
+                <select name="model" id="modelFilter" class="form-select rounded-pill" onchange="this.form.submit()">
+                    <option value="">所有模型</option>
+                    <option value="BERT" {% if request.args.get('model') == 'BERT' %}selected{% endif %}>BERT</option>
+                    <option value="GCN" {% if request.args.get('model') == 'GCN' %}selected{% endif %}>GCN</option>
+                </select>
+            </div>
+        </form>
+        <a href="{{ url_for('export') }}" class="btn btn-info rounded-pill px-4">导出记录 (CSV)</a>
+    </div>
+
+    {% if records %}
+    <table class="table table-hover table-bordered" style="background-color: #f9f9f9; border-radius: 12px; overflow: hidden;">
+    <thead class="table-secondary" style="border-radius: 12px 12px 0 0;">
+        <tr>
+            <th scope="col" style="width: 6%; text-align: center;">用户名</th>
+            <th scope="col">数据</th>
+            <th scope="col" style="width: 10%; text-align: center;">检测结果</th>
+            <th scope="col">置信度</th>
+            <th scope="col" >检测时间</th>
+            <th scope="col">关键词</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in records %}
+        <tr>
+            <td style="width: 6%; text-align: center;">{{ record[5] }}</td>
+            <td>
+                <span class="text-toggle" onclick="toggleText(this)">
+                    <span class="short-text">{{ record[0][:50] }}{% if record[0]|length > 50 %}...{% endif %}</span>
+                    <span class="full-text d-none">{{ record[0] }}</span>
+                </span>
+            </td>
+            <td style="width: 10%; text-align: center;">
+                {% if record[1] == "Real" %}
+                    <span class="badge bg-success rounded-pill">真实</span>
+                {% else %}
+                    <span class="badge bg-danger rounded-pill">虚假</span>
+                {% endif %}
+            </td>
+            <td>{{ "%.4f"|format(record[2]) }}</td>
+            <td>{{ record[3] }}</td>
+            <td>
+                {% if record[4] is iterable and not record[4] is string %}
+                    {{ record[4] | join(', ') }}
+                {% else %}
+                    {{ record[4] }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+
+
+    <!-- 分页控制 -->
+    <div class="d-flex justify-content-center">
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm">
+                {% if page > 1 %}
+                <li class="page-item">
+                    <a class="page-link rounded-pill" href="{{ url_for('history', page=page-1) }}" aria-label="Previous" style="background-color: #f0f0f0;">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link rounded-pill" aria-hidden="true" style="background-color: #f0f0f0;">&laquo;</span>
+                </li>
+                {% endif %}
+
+                <li class="page-item disabled"><span class="page-link rounded-pill" style="background-color: #f0f0f0;">{{ page }}</span></li>
+
+                {% if page < total_pages %}
+                <li class="page-item">
+                    <a class="page-link rounded-pill" href="{{ url_for('history', page=page+1) }}" aria-label="Next" style="background-color: #f0f0f0;">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link rounded-pill" aria-hidden="true" style="background-color: #f0f0f0;">&raquo;</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+
+    {% else %}
+    <p>暂无历史记录。</p>
+    {% endif %}
+</div>
+
+<script>
+    function toggleText(el) {
+        const shortText = el.querySelector('.short-text');
+        const fullText = el.querySelector('.full-text');
+        shortText.classList.toggle('d-none');
+        fullText.classList.toggle('d-none');
+    }
+</script>
+{% endblock %}

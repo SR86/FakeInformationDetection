@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}检测模型选择 | Fake Information Detection{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+
+    <!-- 顶部欢迎区 -->
+    <div class="text-center mb-4">
+    <h1 class="fw-semibold fs-3">👋 欢迎回来，{{ session['username'] }}</h1>
+    <p class="text-muted fs-6 mt-2">
+        本平台基于 Bert 与 GNN 技术，为社交媒体内容提供<br>
+        高效、精准的虚假信息检测服务。
+    </p>
+</div>
+
+
+    <!-- 平台简介卡片 -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card border-0 rounded-4 shadow-sm h-100 bg-light">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">🧠 模型简介</h4>
+                    <ul class="card-text ps-3">
+                        <li><strong>BERT 模型：</strong> 适合语言理解任务，擅长从文本中挖掘语义与上下文信息。</li>
+                        <li><strong>GCN 模型：</strong> 善于建模信息传播路径，可用于分析社交网络中内容的可信度。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 rounded-4 shadow-sm h-100">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">🛠 使用流程</h4>
+                    <ol class="card-text fs-6">
+                        <li>选择合适的检测模型</li>
+                        <li>上传待检测文本或结构数据</li>
+                        <li>获取结果与置信度评分</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 检测入口按钮 -->
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-4">
+            <a href="{{ url_for('detectbert') }}" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm">
+                🚀 使用 BERT 模型
+            </a>
+        </div>
+        <div class="col-md-4 mt-3 mt-md-0">
+            <a href="{{ url_for('detectgcn') }}" class="btn btn-success btn-lg w-100 rounded-pill shadow-sm">
+                🌐 使用 GCN 模型
+            </a>
+        </div>
+    </div>
+
+    <!-- 模型性能表 -->
+<div class="row mt-5">
+    <div class="col-md-10 offset-md-1">
+        <div class="card border-0 rounded-4 shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title mb-2 text-center">📊 模型性能展示</h4>
+                <p class="text-muted text-center small mb-4">
+                    下图展示了BERT 与 GCN 模型的性能。
+                </p>
+                <canvas id="performanceChart" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- Chart.js 图表 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['准确率', '召回率', 'F1 分数'],
+            datasets: [
+                {
+                    label: 'BERT',
+                    data: [0.989, 0.984, 0.988],
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'GCN',
+                    data: [0.966, 0.958, 0.965],
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 1.0,
+                    ticks: {
+                        stepSize: 0.1
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

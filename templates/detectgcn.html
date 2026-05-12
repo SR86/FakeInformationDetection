@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}GCN 模型检测 - Fake Information Detection{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold display-6">基于 <span class="text-primary">GCN</span> 的传播图检测系统</h2>
+        <p class="text-muted">
+            请上传包含传播结构和特征的 <code>.npz</code> 文件，系统将自动进行真实性分析。
+        </p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="mb-5">
+        <div class="mb-4">
+            <label for="npz_file" class="form-label"><strong>📁 上传 .npz 文件</strong></label>
+            <input type="file" id="npz_file" name="npz_file" class="form-control shadow-sm p-2 bg-body rounded" accept=".npz" required>
+            <div class="form-text text-muted mt-2">
+                请确保文件中包含必要的图结构与节点特征，例如 <code>x</code>、<code>edge_index</code>、<code>node_features</code> 等。
+            </div>
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-lg text-white px-5 py-2 rounded-pill shadow" style="background: linear-gradient(90deg, #0d6efd, #0dcaf0); border: none;">
+                <i class="bi bi-search me-2"></i>开始检测
+            </button>
+        </div>
+    </form>
+
+{% if result %}
+<div class="container mt-5">
+    <!-- 预测结果展示 -->
+    <div class="card shadow-lg border-0 rounded-4 bg-light-subtle mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-4 text-center">🔍 检测结果</h4>
+
+            <!-- 预测标签 -->
+            <div class="mb-3">
+                <strong class="me-2"><i class="bi bi-shield-check"></i> 预测标签：</strong>
+                {% if result.label == 'Fake' %}
+                    <span class="badge bg-danger fs-5 py-2 px-3 rounded-pill">❌ 虚假信息</span>
+                {% else %}
+                    <span class="badge bg-success fs-5 py-2 px-3 rounded-pill">✅ 真实信息</span>
+                {% endif %}
+            </div>
+
+            <!-- 置信度 -->
+            <div class="mb-3">
+                <strong class="me-2"><i class="bi bi-bar-chart-line"></i> 置信度：</strong>
+                <span class="fs-5 fw-bold">{{ result.confidence }}</span>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 边索引样本 -->
+    <div class="card shadow-lg border-0 rounded-4 bg-light-subtle mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-3">🔗 边索引样本</h4>
+            <pre class="bg-dark text-white p-3 rounded-3">{{ result.edge_index_sample | safe }}</pre>
+        </div>
+    </div>
+
+    <!-- 传播图结构可视化 -->
+    <div class="card shadow-lg border-0 rounded-4 bg-light-subtle mb-5">
+        <div class="card-body">
+            <h4 class="card-title mb-3">🌐 传播图结构可视化</h4>
+            <div id="cy" style="width: 100%; height: 500px; border: 1px solid #ccc; margin-bottom: 30px;"></div>
+        </div>
+    </div>
+
+    <!-- 加载 Cytoscape.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.24.0/cytoscape.min.js"></script>
+
+    <script>
+        const graphData = {{ result.graph_json | safe }};
+        const cy = cytoscape({
+            container: document.getElementById('cy'),
+            elements: graphData,
+            layout: { name: 'cose' },
+            style: [
+                {
+                    selector: 'node',
+                    style: {
+                        'background-color': '#0074D9',
+                        'label': 'data(label)',
+                        'color': '#fff',
+                        'text-valign': 'center',
+                        'text-halign': 'center',
+                        'font-size': 10
+                    }
+                },
+                {
+                    selector: 'edge',
+                    style: {
+                        'width': 2,
+                        'line-color': '#aaa'
+                    }
+                }
+            ]
+        });
+    </script>
+</div>
+{% endif %}
+
+
+
+
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}修改个人资料 - Fake Information Detection{% endblock %}
+
+{% block content %}
+<div class="container py-2" style="max-width: 900px;">
+    <div class="text-center mb-2">
+        <h2 class="fw-bold text-primary">🛠 修改个人资料</h2>
+        <p class="text-muted">更新您的账户信息和头像</p>
+    </div>
+
+    {% if user %}
+    <form action="{{ url_for('edit_profile') }}" method="POST" enctype="multipart/form-data" class="shadow-sm p-3 bg-light rounded-4">
+        <div class="mb-3">
+            <label for="nickname" class="form-label">昵称</label>
+            <input type="text" id="nickname" name="nickname" value="{{ user.nickname }}" class="form-control rounded-pill px-3" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">邮箱</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" class="form-control rounded-pill px-3" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="phone" class="form-label">手机号</label>
+            <input type="tel" id="phone" name="phone" value="{{ user.phone }}" class="form-control rounded-pill px-3">
+        </div>
+
+        <div class="mb-4">
+            <label for="avatar" class="form-label">头像上传</label>
+            <input type="file" id="avatar" name="avatar" class="form-control rounded-pill px-3">
+            <div class="form-text">支持 JPG / PNG 格式，推荐尺寸 150x150px。</div>
+        </div>
+
+        <div class="d-grid gap-3">
+    <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill shadow-sm">
+        💾 保存修改
+    </button>
+    <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary btn-lg w-100 rounded-pill">
+        🔙 返回个人资料
+    </a>
+</div>
+
+    </form>
+
+    {% elif error %}
+    <div class="alert alert-danger text-center">{{ error }}</div>
+    <div class="text-center">
+        <a href="{{ url_for('login') }}" class="btn btn-primary rounded-pill mt-3">重新登录</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

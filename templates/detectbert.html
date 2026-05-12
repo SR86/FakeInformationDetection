@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}BERT 检测结果 | Fake Information Detection{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <!-- 顶部标题 -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold display-7">基于 <span class="text-primary">BERT</span> 的文本检测系统</h2>
+        <p class="text-muted fs-6">输入一段文本，系统将判断其真实性，并提供关键词解释。</p>
+    </div>
+
+    <!-- 输入表单 -->
+    <form method="post" class="mb-5">
+        <div class="form-group">
+            <label for="text" class="form-label fs-5"><i class="bi bi-chat-text me-2"></i>请输入要检测的文本内容：</label>
+            <textarea name="text" id="text" class="form-control shadow-sm p-3 mb-3 bg-body rounded-4" rows="5" required placeholder="For example: An unknown virus has emerged in a certain area, and multiple people have already been infected...">{{ request.form.text or '' }}</textarea>
+        </div>
+        <div class="text-center mt-3">
+            <button type="submit" class="btn btn-lg text-white px-5 py-2 rounded-pill shadow" style="background: linear-gradient(90deg, #0d6efd, #0dcaf0); border: none;">
+                <i class="bi bi-search me-2"></i>开始检测
+            </button>
+        </div>
+    </form>
+
+    <!-- 检测结果展示 -->
+    {% if result %}
+    <div class="card shadow-sm border-0 rounded-4 bg-light-subtle">
+        <div class="card-body">
+            <h4 class="card-title mb-4 text-center">🔍 检测结果</h4>
+
+            <div class="mb-3">
+                <strong class="me-2"><i class="bi bi-shield-check"></i> 预测标签：</strong>
+                {% if result.label == 'Fake' %}
+                    <span class="badge bg-danger fs-5 py-2 px-3 rounded-pill">❌ 虚假信息</span>
+                {% else %}
+                    <span class="badge bg-success fs-5 py-2 px-3 rounded-pill">✅ 真实信息</span>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                <strong class="me-2"><i class="bi bi-bar-chart-line"></i> 置信度：</strong>
+                {{ result.confidence }}
+                <small class="text-muted">（{{ result.confidence_decimal | round(10) }}）</small>
+            </div>
+
+            {% if result.keywords_explained %}
+            <hr>
+            <h5 class="mt-4 mb-3"><i class="bi bi-lightbulb"></i> 关键词与解释</h5>
+            <ul class="list-group list-group-flush">
+                {% for keyword, explanation in result.keywords_explained %}
+                <li class="list-group-item py-2">
+                    <span class="badge bg-secondary me-2">{{ keyword }}</span>{{ explanation }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="text-muted mt-3">🔍 未找到关键词解释。</div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

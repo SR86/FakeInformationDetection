@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}用户管理 - Fake Information Detection{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 1000px;">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary"> 用户管理</h2>
+        <p class="text-muted">管理平台用户及其权限</p>
+    </div>
+
+    <!-- 用户列表 -->
+    <div class="card shadow-sm rounded-4 mb-5">
+        <div class="card-header bg-primary text-white fw-semibold rounded-top-4">
+            用户列表
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>用户名</th>
+                        <th>权限</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td class="align-middle">{{ user[1] }}</td>
+                        <td class="align-middle text-capitalize">{{ user[2] }}</td>
+                        <td class="align-middle text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <form method="post" action="{{ url_for('manage_users') }}">
+                                    <input type="hidden" name="user_id" value="{{ user[0] }}">
+                                    <button type="submit" name="action" value="delete" class="btn btn-sm btn-danger rounded-pill px-3">🗑 删除</button>
+                                </form>
+                                <form method="post" action="{{ url_for('manage_users') }}" class="d-flex gap-2 align-items-center">
+                                    <input type="hidden" name="user_id" value="{{ user[0] }}">
+                                    <select name="new_permission" class="form-select form-select-sm w-auto rounded-pill">
+                                        <option value="user" {% if user[2] =='user' %}selected{% endif %}>普通用户</option>
+                                        <option value="admin" {% if user[2] =='admin' %}selected{% endif %}>管理员</option>
+                                    </select>
+                                    <button type="submit" name="action" value="update" class="btn btn-sm btn-warning rounded-pill px-3">🔧 修改</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 分页控制 -->
+    <div class="d-flex justify-content-center mb-5">
+        <nav>
+            <ul class="pagination pagination-sm">
+                <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('manage_users', page=page-1) }}" aria-label="Previous">&laquo;</a>
+                </li>
+                <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+                <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('manage_users', page=page+1) }}" aria-label="Next">&raquo;</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- 新增用户 -->
+    <div class="card shadow-sm rounded-4">
+        <div class="card-header bg-success text-white fw-semibold rounded-top-4">
+            ➕ 新增用户
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('manage_users') }}">
+                <div class="mb-3">
+                    <label for="username" class="form-label">用户名</label>
+                    <input type="text" class="form-control rounded-pill px-3" id="username" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">密码</label>
+                    <input type="password" class="form-control rounded-pill px-3" id="password" name="password" required>
+                </div>
+                <div class="mb-3">
+                    <label for="permission" class="form-label">权限</label>
+                    <select name="permission" class="form-select rounded-pill px-3" required>
+                        <option value="user">普通用户</option>
+                        <option value="admin">管理员</option>
+                    </select>
+                </div>
+                <div class="text-end">
+                    <button type="submit" name="action" value="add" class="btn btn-primary rounded-pill px-4">✅ 添加用户</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
